@@ -1,8 +1,10 @@
 {
   "compilerOption": {
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
+    "types": ["vitest/globals"],
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
