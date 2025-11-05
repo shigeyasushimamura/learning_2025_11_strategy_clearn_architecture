@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "test": "vitest",
+    "test": "vitest --coverage",
     "test:watch": "vitest --watch",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
@@ -17,9 +17,10 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.0",
+    "@vitest/coverage-v8": "^4.0.7",
     "prisma": "^5.22.0",
     "tsx": "^4.20.6",
     "typescript": "^5.3.3",
-    "vitest": "^1.1.0"
+    "vitest": "^4.0.7"
   }
 }
