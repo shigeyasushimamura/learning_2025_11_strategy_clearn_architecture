@@ -15,6 +15,7 @@ export interface StateTransition {
  * 遷移時のコンテキスト
  */
 export interface TransitionContext {
+  triggeredBy?: string;
   scheduledAt?: Date;
   currentTime?: Date;
 }
