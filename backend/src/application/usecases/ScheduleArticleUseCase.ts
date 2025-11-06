@@ -1,21 +1,22 @@
 import { Article } from "@prisma/client";
 import { IArticleRepository } from "../ports/IArticleRepository";
 import { IEventPublisher } from "../ports/IEventPublisher";
+import { ScheduleArticleInput } from "../dto/CreateArticleInput";
 import { ArticleStateMachine } from "../../domain/article/ArticleStateMachine";
 import { ArticleState } from "../../domain/article/ArticleState";
 import { ArticleEvent } from "../../domain/article/ArticleEvent";
 import { Result, ok, fail } from "../../domain/shared/Result";
-import { DomainError } from "../../domain/shared/DomainError";
+import { DomainError, ValidationError } from "../../domain/shared/DomainError";
 
 /**
- * 記事公開ユースケース
+ * 予約投稿ユースケース
  *
  * 責務:
- * - 状態ステートマシンを使った公開処理
- * - 公開日時の設定
+ * - 予約時刻のバリデーション
+ * - 状態ステートマシンを使った予約設定
  * - イベント発行
  */
-export class PublishArticleUseCase {
+export class ScheduleArticleUseCase {
   constructor(
     private articleRepository: IArticleRepository,
     private eventPublisher: IEventPublisher
@@ -23,17 +24,27 @@ export class PublishArticleUseCase {
 
   async execute(
     articleId: string,
+    input: ScheduleArticleInput,
     userId: string
   ): Promise<Result<Article, DomainError>> {
-    // 記事を取得
     const article = await this.articleRepository.findById(articleId);
     if (!article) {
-      return fail(new DomainError("Article not found", "NOT_FOUND"));
+      return fail(new DomainError("Article not found", "Not_FOUND"));
     }
 
-    // 権限チェック（著者のみ公開可能）
+    // 権限チェック
+    // authorIdがなりすましかどうか判定するのはあくまでapplication層ではない
     if (article.authorId !== userId) {
       return fail(new DomainError("Unauthorized", "UNAUTHORIZED"));
+    }
+
+    // 予約時刻のバリデーション
+    const now = new Date();
+    if (input.scheduledAt <= now) {
+      new ValidationError(
+        "Scheduled time must be in the future",
+        "scheduledAt"
+      );
     }
 
     // 状態ステートマシンで遷移
@@ -42,21 +53,21 @@ export class PublishArticleUseCase {
       article.scheduledAt || undefined
     );
 
-    // これにより状態ステートマシンの状態が->PUBLISHEDになる
-    const transitionResult = stateMachine.transition(ArticleEvent.PUBLISH, {
+    const transitionResult = stateMachine.transition(ArticleEvent.SCHEDULE, {
       triggeredBy: userId,
-      scheduledAt: new Date(),
+      scheduledAt: input.scheduledAt,
+      currentTime: now,
     });
 
     if (transitionResult.isFailure) {
       return fail(transitionResult.unwrapError());
     }
 
+    // 記事を更新
     const updatedArticle: Article = {
       ...article,
       state: stateMachine.getState(),
-      publishedAt: new Date(),
-      scheduledAt: null,
+      scheduledAt: input.scheduledAt,
       updatedAt: new Date(),
     };
 
