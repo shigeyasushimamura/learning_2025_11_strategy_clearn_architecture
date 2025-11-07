@@ -7,6 +7,7 @@ const SHCEDULE_INTERVAL = 60 * 1000; // 1分間隔
 /**
  * 記事の自動公開スケジューラー
  * PostgresSQLの pg_cronで実行
+ * 【拡張案】Cloudflare cron triggersを利用
  */
 export class ArticleScheduler {
   private useCase: AutoPublishArticleUseCase;

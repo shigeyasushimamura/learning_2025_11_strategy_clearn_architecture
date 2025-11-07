@@ -109,9 +109,6 @@ describe("PrismaArticleRepository", () => {
       },
     });
 
-    await repository.save(draftArticle);
-    await repository.save(publishedArticle);
-
     const published = await repository.findPublished();
 
     expect(published.some((a) => a.id === publishedArticle.id)).toBe(true);
