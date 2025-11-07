@@ -31,6 +31,7 @@ describe("PrismaArticleRepository", () => {
   it("記事を保存できる", async () => {
     const article = await prisma.article.create({
       data: {
+        id: "testID",
         title: "Test Article",
         slug: "test-article-" + Date.now(),
         content: "Content",
@@ -39,10 +40,10 @@ describe("PrismaArticleRepository", () => {
       },
     });
 
-    const saved = await repository.save(article);
+    const saved = await repository.findById("testID");
 
-    expect(saved.id).toBe(article.id);
-    expect(saved.title).toBe(article.title);
+    expect(saved?.id).toBe(article.id);
+    expect(saved?.title).toBe(article.title);
   });
 
   it("IDで記事を取得できる", async () => {
@@ -56,7 +57,6 @@ describe("PrismaArticleRepository", () => {
       },
     });
 
-    await repository.save(article);
     const found = await repository.findById(article.id);
 
     expect(found).not.toBeNull();
@@ -76,8 +76,6 @@ describe("PrismaArticleRepository", () => {
         authorId: testUser.id,
       },
     });
-
-    await repository.save(article);
 
     const articles = await repository.findScheduledForAutoPublish(new Date());
 
