@@ -17,7 +17,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Created/Found user:", user.email);
+  console.log("✅ Created/Found user:", user);
 
   // タグ作成
   const tags = await Promise.all([
