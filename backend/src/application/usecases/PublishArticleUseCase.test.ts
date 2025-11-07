@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PublishArticleUseCase } from "./PublishArticleUseCase";
 import { IArticleRepository } from "../ports/IArticleRepository";
 import { IEventPublisher } from "../ports/IEventPublisher";
-import { Article, ArticleState } from "@prisma/client";
+import { Article } from "@prisma/client";
 import { ArticleState } from "../../domain/article/ArticleState";
 
 /**
