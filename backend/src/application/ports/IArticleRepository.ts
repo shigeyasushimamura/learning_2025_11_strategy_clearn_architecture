@@ -39,7 +39,7 @@ export interface IArticleRepository {
       limit?: number;
       offset?: number;
     }
-  ): Promise<Article>;
+  ): Promise<Article[]>;
 
   /**
    * 自動公開対象の記事を取得
