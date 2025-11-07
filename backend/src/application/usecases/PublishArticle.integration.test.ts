@@ -34,8 +34,6 @@ describe("PublishArticleUseCase - Integration", () => {
   });
 
   it("下書き記事を公開できる", async () => {
-    console.log("*testUser", testUser);
-
     // 下書き記事のサンプル
     // useCase層からPrismaの詳細を知りたくないので、直接prismaにデータを作りにいかない
     const article: Article = {
