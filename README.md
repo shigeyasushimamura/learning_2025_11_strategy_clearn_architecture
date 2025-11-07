@@ -16,6 +16,7 @@
 - [📊 データモデル](#-データモデル)
 - [🔄 状態機械](#-状態機械)
 - [🧪 テスト戦略](#-テスト戦略)
+- [📝 API 仕様](#-api仕様)
 
 ---
 
@@ -533,6 +534,86 @@ describe("ArticleStateMachine", () => {
 # 全テスト実行
 npm run test
 
+```
+
+---
+
+## 📝 API 仕様
+
+### エンドポイント一覧
+
+#### 記事管理
+
+| Method | Endpoint                     | 説明                   | 認証(将来必要な場合) |
+| ------ | ---------------------------- | ---------------------- | -------------------- |
+| GET    | `/api/articles`              | 記事一覧（公開中のみ） | 不要                 |
+| GET    | `/api/articles/:id`          | 記事詳細               | 不要                 |
+| GET    | `/api/articles/slug/:slug`   | スラッグで記事取得     | 不要                 |
+| POST   | `/api/articles`              | 記事作成               | 必要                 |
+| POST   | `/api/articles/:id/publish`  | 記事公開               | 必要                 |
+| POST   | `/api/articles/:id/schedule` | 予約投稿設定           | 必要                 |
+| POST   | `/api/articles/:id/archive`  | アーカイブ             | 必要                 |
+
+#### システム
+
+| Method | Endpoint                 | 説明           | 認証(将来必要な場合) |
+| ------ | ------------------------ | -------------- | -------------------- |
+| GET    | `/health`                | ヘルスチェック | 不要                 |
+| POST   | `/api/cron/auto-publish` | 自動公開実行   | API キー             |
+
+### リクエスト例
+
+#### 記事作成
+
+```bash
+POST /api/articles
+Content-Type: application/json
+X-User-Id: user-123
+
+{
+  "title": "東京の隠れた名店10選",
+  "content": "# 東京の隠れた名店\n\n...",
+  "excerpt": "地元民が愛する名店を紹介",
+  "coverImage": "https://example.com/image.jpg",
+  "authorId": "user-123",
+  "tagIds": ["tag-1", "tag-2"]
+}
+```
+
+#### 予約投稿
+
+```bash
+POST /api/articles/article-123/schedule
+Content-Type: application/json
+X-User-Id: user-123
+
+{
+  "scheduledAt": "2025-11-10T09:00:00Z"
+}
+```
+
+### レスポンス例
+
+```json
+{
+  "id": "article-123",
+  "title": "東京の隠れた名店10選",
+  "slug": "tokyo-hidden-restaurants-1730000000",
+  "content": "# 東京の隠れた名店...",
+  "state": "SCHEDULED",
+  "scheduledAt": "2025-11-10T09:00:00Z",
+  "author": {
+    "id": "user-123",
+    "name": "山田太郎",
+    "avatarUrl": "https://example.com/avatar.jpg"
+  },
+  "tags": [
+    { "id": "tag-1", "name": "東京", "slug": "tokyo" },
+    { "id": "tag-2", "name": "グルメ", "slug": "gourmet" }
+  ],
+  "createdAt": "2025-11-07T10:00:00Z",
+  "updatedAt": "2025-11-07T10:00:00Z"
+}
 ```
 
 ---
